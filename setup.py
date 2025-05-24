@@ -23,26 +23,25 @@ dev_requirements = read_requirements('requirements-dev.txt')
 
 def run_command(command, description):
     """Run a command and handle errors"""
-    print(f"📦 {description}...")
+    print(f"[INFO] {description}...")
     try:
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        print(f"✅ {description} completed successfully")
+        print(f"[SUCCESS] {description} completed successfully")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ {description} failed:")
+        print(f"[ERROR] {description} failed:")
         print(f"   Command: {command}")
         print(f"   Error: {e.stderr}")
         return False
 
 def check_python_version():
-    """Check if Python version is compatible"""
-    version = sys.version_info
+    """Check if Python version is compatible"""    version = sys.version_info
     if version.major < 3 or (version.major == 3 and version.minor < 8):
-        print("❌ Python 3.8 or higher is required")
+        print("[ERROR] Python 3.8 or higher is required")
         print(f"   Current version: {version.major}.{version.minor}.{version.micro}")
         return False
     
-    print(f"✅ Python version {version.major}.{version.minor}.{version.micro} is compatible")
+    print(f"[SUCCESS] Python version {version.major}.{version.minor}.{version.micro} is compatible")
     return True
 
 def install_playwright_browsers():
@@ -136,18 +135,17 @@ setup(
 
 def main():
     """Main setup function"""
-    print("🚀 Google Image Scraper Setup")
+    print("Google Image Scraper Setup")
     print("=" * 50)
     
     if not check_python_version():
         sys.exit(1)
     
-    print("\n📦 Installing package and dependencies...")
-    if not install_dependencies():
-        print("\n❌ Setup failed. Please check the errors above.")
+    print("\nInstalling package and dependencies...")
+    if not install_dependencies():        print("\n[ERROR] Setup failed. Please check the errors above.")
         sys.exit(1)
     
-    print("\n🎉 Setup completed successfully!")
+    print("\n[SUCCESS] Setup completed successfully!")
     print("\nYou can now use the scraper in several ways:")
     print("1. Command line: google-image-scraper cats dogs --count 10")
     print("2. Short alias: gis cats dogs --count 10")

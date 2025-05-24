@@ -7,9 +7,9 @@ import sys
 import os
 
 # Add parent directory to path so we can import our modules
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src'))
 
-from utils import (
+from google_image_scraper.utils.helpers import (
     is_valid_image_url, 
     clean_search_key, 
     decode_url, 
