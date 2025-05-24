@@ -34,9 +34,9 @@ pip install -r requirements.txt
 playwright install
 ```
 
-### Using the new setup script
+### Using the setup script
 ```bash
-python setup_new.py
+python setup.py
 ```
 
 ## 🚀 Quick Start
@@ -114,8 +114,8 @@ google-image-scraper-clean/
 ├── tests/                          # Test cases
 ├── requirements.txt                # Core dependencies
 ├── requirements-dev.txt            # Development dependencies
-├── setup_new.py                   # New professional setup script
-└── README.md                      # This file
+├── setup.py                        # Professional setup script
+└── README.md                       # This file
 ```
 
 ## ⚙️ Configuration Options
