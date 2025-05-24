@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import os
 import io
 import json
@@ -10,10 +10,20 @@ from PIL import Image
 from playwright.async_api._generated import Locator
 from playwright.async_api import async_playwright
 
-def google_images_url(search_key):
-    return f'https://www.google.com/search?q={search_key}&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+from config import DEFAULT_CONFIG
+from logger_utils import setup_logger
+from utils import decode_url, filter_thumbnail_urls, validate_resolution, is_valid_image_url
+from exceptions import (
+    BrowserError, ImageDownloadError, InvalidResolutionError, 
+    URLExtractionError, FileOperationError
+)
 
-def save_urls_to_json(image_urls: List[str], search_key: str, base_dir: str = 'google_search'):
+def google_images_url(search_key: str) -> str:
+    """Generate Google Images search URL for the given search key"""
+    encoded_key = urllib.parse.quote(search_key)
+    return f'https://www.google.com/search?q={encoded_key}&source=lnms&tbm=isch&sa=X&ved=2ahUKEwie44_AnqLpAhUhBWMBHUFGD90Q_AUoAXoECBUQAw&biw=1920&bih=947'
+
+def save_urls_to_json(image_urls: List[str], search_key: str, base_dir: str = 'google_search') -> Optional[str]:
     """
     Save image URLs to a JSON file in the google_search folder.
     
@@ -21,47 +31,47 @@ def save_urls_to_json(image_urls: List[str], search_key: str, base_dir: str = 'g
         image_urls: List of image URLs
         search_key: The search term used
         base_dir: Base directory to save the JSON file
+        
+    Returns:
+        Path to the saved JSON file, or None if saving failed
+        
+    Raises:
+        FileOperationError: If file operations fail
     """
-    # Create google_search directory if it doesn't exist
-    if not os.path.exists(base_dir):
-        os.makedirs(base_dir)
-        print(f'[INFO] Created directory: {base_dir}')
+    logger = setup_logger()
     
-    # Clean and decode URLs
-    cleaned_urls = []
-    for url in image_urls:
-        # Decode URL-encoded characters
-        try:
-            # First decode unicode escapes like \u003d
-            cleaned_url = url.encode('utf-8').decode('unicode_escape')
-            # Then decode URL encoding like %20
-            cleaned_url = urllib.parse.unquote(cleaned_url)
-            cleaned_urls.append(cleaned_url)
-        except Exception:
-            # If decoding fails, use original URL
-            cleaned_urls.append(url)
-    
-    # Create filename with timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{search_key}_{timestamp}.json"
-    filepath = os.path.join(base_dir, filename)
-    
-    # Prepare data structure
-    data = {
-        "search_key": search_key,
-        "timestamp": datetime.now().isoformat(),
-        "total_urls": len(cleaned_urls),
-        "image_urls": cleaned_urls
-    }
-    
-    # Save to JSON file
     try:
+        # Create google_search directory if it doesn't exist
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
+            logger.info(f'Created directory: {base_dir}')
+        
+        # Clean and decode URLs
+        cleaned_urls = [decode_url(url) for url in image_urls]
+        
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{search_key}_{timestamp}.json"
+        filepath = os.path.join(base_dir, filename)
+        
+        # Prepare data structure
+        data = {
+            "search_key": search_key,
+            "timestamp": datetime.now().isoformat(),
+            "total_urls": len(cleaned_urls),
+            "image_urls": cleaned_urls
+        }
+        
+        # Save to JSON file
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        print(f'[INFO] Saved {len(cleaned_urls)} URLs to: {filepath}')
+        logger.info(f'Saved {len(cleaned_urls)} URLs to: {filepath}')
         return filepath
+        
+    except OSError as e:
+        raise FileOperationError("save", filepath, str(e))
     except Exception as e:
-        print(f'[ERROR] Failed to save URLs to JSON: {e}')
+        logger.error(f'Failed to save URLs to JSON: {e}')
         return None
 
 async def find_image_urls(

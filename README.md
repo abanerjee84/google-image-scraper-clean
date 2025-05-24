@@ -1,8 +1,8 @@
 # Google Image Scraper with Playwright
 
-A Python script to scrape and download full-resolution images from Google Images using Playwright.
+A robust Python script to scrape and download full-resolution images from Google Images using Playwright with advanced features including performance monitoring, comprehensive logging, and CLI interface.
 
-## Features
+## ✨ Features
 
 - ✅ **Full-resolution image extraction** - Gets actual high-quality images, not thumbnails
 - ✅ **JSON URL saving** - Saves all extracted URLs to timestamped JSON files
@@ -10,44 +10,110 @@ A Python script to scrape and download full-resolution images from Google Images
 - ✅ **Parallel processing** - Supports multiple search terms simultaneously
 - ✅ **Robust error handling** - Continues working even if some images fail to download
 - ✅ **Browser automation** - Uses Playwright for reliable web scraping
+- ✅ **Performance monitoring** - Track memory usage, CPU usage, and download rates
+- ✅ **Comprehensive logging** - Detailed logs with different verbosity levels
+- ✅ **CLI interface** - Easy-to-use command line interface
+- ✅ **Input validation** - Validates all inputs to prevent errors
+- ✅ **Configuration management** - Centralized configuration system
+- ✅ **Type hints** - Full type annotations for better code quality
 
-## Installation
+## 🚀 Quick Start
+
+### Installation
 
 1. **Clone or download this project**
 
-2. **Install Python dependencies:**
+2. **Run the setup script:**
+   ```bash
+   python setup.py
+   ```
+   
+   Or install manually:
    ```bash
    pip install -r requirements.txt
-   ```
-
-3. **Install Playwright browsers:**
-   ```bash
    playwright install
    ```
 
-## Usage
-
 ### Basic Usage
 
-Edit the `search_keys` list in `main.py` and run:
+#### Using the CLI (Recommended)
+```bash
+# Basic usage
+python cli.py cats dogs --count 10
 
-```python
-# Edit this line in main.py
-search_keys = list(set(['cat', 'dog', 'apple']))  # Add your search terms
+# Advanced usage with options
+python cli.py "red roses" --count 20 --min-res 800x600 --max-res 1920x1080 --headless
 
-# Run the script
-python main.py
+# Dry run (extract URLs but don't download)
+python cli.py "python programming" --dry-run --verbose
 ```
 
-### Advanced Usage
-
-You can also use the scraper programmatically:
-
+#### Using the Python API
 ```python
 import asyncio
 from GoogleImageScraper import find_image_urls, save_images
 
 async def scrape_images():
+    # Find image URLs
+    urls = await find_image_urls(
+        search_key='cats',
+        number_of_images=10,
+        headless=True
+    )
+    
+    # Download images
+    if urls:
+        await save_images(
+            image_urls=urls,
+            images_dir_path='my_photos',
+            image_file_prefix='cat'
+        )
+
+asyncio.run(scrape_images())
+```
+
+## 📖 Detailed Documentation
+
+### Command Line Interface
+
+The CLI provides the most user-friendly way to use the scraper:
+
+```bash
+python cli.py [search_terms] [options]
+```
+
+**Positional Arguments:**
+- `search_terms`: One or more search terms to scrape images for
+
+**Options:**
+- `-c, --count`: Number of images per search term (default: 10)
+- `--max-missed`: Max failed downloads before stopping (default: 10)
+- `--headless`: Run browser without GUI
+- `--show-browser`: Show browser GUI
+- `--min-res`: Minimum resolution (e.g., 800x600)
+- `--max-res`: Maximum resolution (e.g., 1920x1080)
+- `--format`: Image format (jpg, png, jpeg)
+- `--output`: Output directory (default: photos)
+- `--keep-filenames`: Keep original URL filenames
+- `--timeout`: Download timeout in seconds
+- `--workers`: Number of concurrent workers
+- `--verbose`: Enable verbose logging
+- `--dry-run`: Extract URLs but don't download
+
+**Examples:**
+```bash
+# Download 20 cat images in headless mode
+python cli.py cats --count 20 --headless
+
+# Download high-resolution rose images
+python cli.py "red roses" --min-res 1024x768 --max-res 2560x1440
+
+# Multiple search terms with custom output
+python cli.py cats dogs birds --output ./animals --format png
+
+# Dry run to see what would be downloaded
+python cli.py "vintage cars" --dry-run --verbose
+```
     # Extract URLs
     image_urls = await find_image_urls(
         search_key='cat',

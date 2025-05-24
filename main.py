@@ -38,7 +38,7 @@ async def main():
 
     #Removes duplicate strings from search_keys
     #Add new search key into array ['cat','t-shirt','apple','orange','pear','fish']
-    search_keys = list(set(['lettuce', 'spinach']))
+    search_keys = list(set(['Leviathan Storm Cannon 40k', 'spinach']))
 
     #Parameters
     number_of_images = 10                # Desired number of images

@@ -1,3 +1,10 @@
-playwright
-httpx
-Pillow
+# Core dependencies
+playwright>=1.40.0
+httpx>=0.25.0
+Pillow>=10.0.0
+
+# Performance monitoring
+psutil>=5.9.0
+
+# Development dependencies (optional)
+# Install with: pip install -r requirements-dev.txt
