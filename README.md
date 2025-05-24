@@ -1,224 +1,260 @@
-# Google Image Scraper with Playwright
+# Google Image Scraper - Professional Edition
 
-A robust Python script to scrape and download full-resolution images from Google Images using Playwright with advanced features including performance monitoring, comprehensive logging, and CLI interface.
+A sophisticated, modular Python package for scraping and downloading high-resolution images from Google Images with advanced filtering, error handling, and professional code structure.
 
-## ✨ Features
+## 🌟 Features
 
-- ✅ **Full-resolution image extraction** - Gets actual high-quality images, not thumbnails
-- ✅ **JSON URL saving** - Saves all extracted URLs to timestamped JSON files
-- ✅ **Advanced URL filtering** - Filters out thumbnails, logos, and low-quality images
-- ✅ **Parallel processing** - Supports multiple search terms simultaneously
-- ✅ **Robust error handling** - Continues working even if some images fail to download
-- ✅ **Browser automation** - Uses Playwright for reliable web scraping
-- ✅ **Performance monitoring** - Track memory usage, CPU usage, and download rates
-- ✅ **Comprehensive logging** - Detailed logs with different verbosity levels
-- ✅ **CLI interface** - Easy-to-use command line interface
-- ✅ **Input validation** - Validates all inputs to prevent errors
-- ✅ **Configuration management** - Centralized configuration system
-- ✅ **Type hints** - Full type annotations for better code quality
+- **Full-Resolution Images**: Advanced extraction methods to get actual full-size images, not thumbnails
+- **Professional Architecture**: Clean, modular codebase with proper separation of concerns
+- **Async/Await Support**: High-performance asynchronous operations
+- **Advanced Filtering**: Resolution-based filtering, thumbnail detection, and quality control
+- **Robust Error Handling**: Comprehensive exception handling with detailed logging
+- **CLI Interface**: Feature-rich command-line interface with extensive options
+- **Configurable**: Highly customizable configuration system
+- **Type Hints**: Full type annotation support for better IDE integration
+- **Comprehensive Logging**: Detailed logging with file and console output
+
+## 📦 Installation
+
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+
+### Quick Installation
+```bash
+# Clone the repository
+git clone https://github.com/abanerjee84/google-image-scraper-clean.git
+cd google-image-scraper-clean
+
+# Install in development mode (recommended)
+pip install -e .
+
+# Or install dependencies manually
+pip install -r requirements.txt
+playwright install
+```
+
+### Using the new setup script
+```bash
+python setup_new.py
+```
 
 ## 🚀 Quick Start
 
-### Installation
+### Command Line Usage
 
-1. **Clone or download this project**
-
-2. **Run the setup script:**
-   ```bash
-   python setup.py
-   ```
-   
-   Or install manually:
-   ```bash
-   pip install -r requirements.txt
-   playwright install
-   ```
-
-### Basic Usage
-
-#### Using the CLI (Recommended)
 ```bash
 # Basic usage
-python cli.py cats dogs --count 10
+google-image-scraper cats dogs --count 10
 
-# Advanced usage with options
-python cli.py "red roses" --count 20 --min-res 800x600 --max-res 1920x1080 --headless
+# Advanced usage with resolution filtering
+google-image-scraper "red roses" --count 20 --min-res 800x600 --max-res 1920x1080 --format png
 
-# Dry run (extract URLs but don't download)
-python cli.py "python programming" --dry-run --verbose
+# Dry run (extract URLs only)
+google-image-scraper "python programming" --dry-run --verbose
+
+# Using short alias
+gis cats --count 5 --headless
 ```
 
-#### Using the Python API
+### Python Library Usage
+
 ```python
 import asyncio
-from GoogleImageScraper import find_image_urls, save_images
+from google_image_scraper import GoogleImageScraper, ScrapingConfig
 
-async def scrape_images():
-    # Find image URLs
-    urls = await find_image_urls(
-        search_key='cats',
+async def main():
+    # Create custom configuration
+    config = ScrapingConfig(
         number_of_images=10,
-        headless=True
+        headless=True,
+        min_resolution=(800, 600),
+        max_resolution=(1920, 1080),
+        image_save_format='png',
+        photos_dir='downloads'
     )
     
-    # Download images
-    if urls:
-        await save_images(
-            image_urls=urls,
-            images_dir_path='my_photos',
-            image_file_prefix='cat'
-        )
-
-asyncio.run(scrape_images())
-```
-
-## 📖 Detailed Documentation
-
-### Command Line Interface
-
-The CLI provides the most user-friendly way to use the scraper:
-
-```bash
-python cli.py [search_terms] [options]
-```
-
-**Positional Arguments:**
-- `search_terms`: One or more search terms to scrape images for
-
-**Options:**
-- `-c, --count`: Number of images per search term (default: 10)
-- `--max-missed`: Max failed downloads before stopping (default: 10)
-- `--headless`: Run browser without GUI
-- `--show-browser`: Show browser GUI
-- `--min-res`: Minimum resolution (e.g., 800x600)
-- `--max-res`: Maximum resolution (e.g., 1920x1080)
-- `--format`: Image format (jpg, png, jpeg)
-- `--output`: Output directory (default: photos)
-- `--keep-filenames`: Keep original URL filenames
-- `--timeout`: Download timeout in seconds
-- `--workers`: Number of concurrent workers
-- `--verbose`: Enable verbose logging
-- `--dry-run`: Extract URLs but don't download
-
-**Examples:**
-```bash
-# Download 20 cat images in headless mode
-python cli.py cats --count 20 --headless
-
-# Download high-resolution rose images
-python cli.py "red roses" --min-res 1024x768 --max-res 2560x1440
-
-# Multiple search terms with custom output
-python cli.py cats dogs birds --output ./animals --format png
-
-# Dry run to see what would be downloaded
-python cli.py "vintage cars" --dry-run --verbose
-```
-    # Extract URLs
-    image_urls = await find_image_urls(
-        search_key='cat',
-        number_of_images=10,
-        headless=True
-    )
+    # Create scraper instance
+    scraper = GoogleImageScraper(config)
     
-    # Download images
-    await save_images(
-        image_urls=image_urls,
-        images_dir_path='my_photos',
-        image_file_prefix='cat'
-    )
+    # Scrape images (find URLs and download)
+    image_urls, downloaded_count = await scraper.scrape('cats')
+    print(f"Downloaded {downloaded_count} images")
+    
+    # Or just extract URLs without downloading
+    urls = await scraper.find_image_urls('dogs')
+    print(f"Found {len(urls)} URLs")
 
-asyncio.run(scrape_images())
+# Run the async function
+asyncio.run(main())
 ```
 
-### Configuration
+## 📁 Project Structure
 
-Modify these parameters in `main.py`:
+```
+google-image-scraper-clean/
+├── src/
+│   └── google_image_scraper/
+│       ├── __init__.py              # Package initialization
+│       ├── core/                    # Core functionality
+│       │   ├── __init__.py
+│       │   ├── scraper.py          # Main scraper class
+│       │   ├── config.py           # Configuration classes
+│       │   └── exceptions.py       # Custom exceptions
+│       ├── utils/                   # Utility functions
+│       │   ├── __init__.py
+│       │   ├── helpers.py          # Helper functions
+│       │   └── logging.py          # Logging utilities
+│       └── cli/                     # Command-line interface
+│           ├── __init__.py
+│           └── main.py             # CLI implementation
+├── examples/                        # Usage examples
+│   └── basic_usage.py              # Basic usage examples
+├── docs/                           # Documentation
+├── tests/                          # Test cases
+├── requirements.txt                # Core dependencies
+├── requirements-dev.txt            # Development dependencies
+├── setup_new.py                   # New professional setup script
+└── README.md                      # This file
+```
+
+## ⚙️ Configuration Options
+
+The `ScrapingConfig` class provides extensive customization options:
 
 ```python
-number_of_images = 10                # Number of images to download
-min_resolution = (0, 0)             # Minimum image resolution
-max_resolution = (9999, 9999)       # Maximum image resolution
-headless = True                     # Run browser in background
+from google_image_scraper import ScrapingConfig
+
+config = ScrapingConfig(
+    number_of_images=10,           # Number of images to download
+    max_missed=10,                 # Max failed downloads before stopping
+    headless=True,                 # Run browser in headless mode
+    min_resolution=(800, 600),     # Minimum image resolution
+    max_resolution=(1920, 1080),   # Maximum image resolution
+    keep_filenames=False,          # Keep original filenames
+    image_save_format='jpg',       # Image format (jpg, png, jpeg)
+    timeout_seconds=5.0,           # Download timeout
+    scroll_attempts=3,             # Number of scroll attempts
+    click_timeout=3000,            # Click timeout in milliseconds
+    photos_dir='photos',           # Output directory
+    json_dir='google_search',      # JSON output directory
+)
 ```
 
-## Output Structure
+## 🖥️ CLI Options
 
-```
-project/
-├── photos/                    # Downloaded images
-│   ├── cat/
-│   │   ├── cat-0.jpg
-│   │   ├── cat-1.jpg
-│   │   └── ...
-│   └── dog/
-│       ├── dog-0.jpg
-│       └── ...
-└── google_search/            # JSON files with URLs
-    ├── cat_20250524_143022.json
-    ├── dog_20250524_143055.json
-    └── ...
-```
+```bash
+google-image-scraper --help
 
-## JSON Output Format
+usage: google-image-scraper [-h] [-c COUNT] [--max-missed MAX_MISSED] 
+                           [--headless] [--show-browser] [--min-res MIN_RES] 
+                           [--max-res MAX_RES] [--format {jpg,png,jpeg}] 
+                           [--output OUTPUT] [--keep-filenames] 
+                           [--timeout TIMEOUT] [--verbose] [--dry-run] 
+                           search_terms [search_terms ...]
 
-Each search creates a JSON file with extracted URLs:
-
-```json
-{
-  "search_key": "cat",
-  "timestamp": "2025-05-24T14:30:22.123456",
-  "total_urls": 10,
-  "image_urls": [
-    "https://example.com/full-resolution-image1.jpg",
-    "https://example.com/full-resolution-image2.jpg"
-  ]
-}
+Options:
+  -c, --count           Number of images per search term (default: 10)
+  --max-missed          Max failed downloads before stopping (default: 10)
+  --headless            Run browser in headless mode
+  --show-browser        Show browser GUI
+  --min-res             Minimum resolution (e.g., 800x600)
+  --max-res             Maximum resolution (e.g., 1920x1080)
+  --format              Image format: jpg, png, jpeg (default: jpg)
+  --output, -o          Output directory (default: photos)
+  --keep-filenames      Keep original filenames from URLs
+  --timeout             Download timeout in seconds (default: 5.0)
+  --verbose, -v         Enable verbose logging
+  --dry-run             Extract URLs but don't download images
 ```
 
-## Requirements
+## 📊 Examples
 
-- Python 3.7+
-- playwright
-- httpx
-- Pillow (PIL)
+### Basic Example
+```python
+# examples/basic_usage.py
+import asyncio
+from google_image_scraper import GoogleImageScraper
 
-## How It Works
+async def simple_example():
+    scraper = GoogleImageScraper()
+    image_urls, downloaded = await scraper.scrape('cats')
+    print(f"Downloaded {downloaded} cat images")
 
-1. **URL Extraction**: Uses multiple methods to extract full-resolution image URLs:
-   - Analyzes JavaScript data in Google Images page
-   - Scans meta tags and page content
-   - Optionally clicks on images to get full-size versions
+asyncio.run(simple_example())
+```
 
-2. **Quality Filtering**: Filters out:
-   - Encrypted thumbnails (`encrypted-tbn`)
-   - Small image indicators (`s64`, `s90`, `s100`)
-   - Logo and favicon images
-   - Very short URLs (likely thumbnails)
+### Advanced Example
+```python
+# Advanced configuration with resolution filtering
+config = ScrapingConfig(
+    number_of_images=20,
+    min_resolution=(1024, 768),
+    max_resolution=(2560, 1440),
+    image_save_format='png',
+    headless=True
+)
 
-3. **URL Cleaning**: Properly decodes Unicode escapes and URL encoding
+scraper = GoogleImageScraper(config)
+urls, count = await scraper.scrape('landscape photography')
+```
 
-4. **Download**: Downloads images with proper error handling and timeout management
+## 🔧 Development
 
-## Notes
+### Setting up for Development
 
-- Some images may fail to download due to anti-bot protection or 404 errors - this is normal
-- The script respects rate limits and includes delays to avoid being blocked
-- Full-resolution images are much larger than thumbnails (typically 500KB - 5MB vs 5-50KB)
-- JSON files allow you to reuse URLs without re-scraping
+```bash
+# Clone and install in development mode
+git clone https://github.com/abanerjee84/google-image-scraper-clean.git
+cd google-image-scraper-clean
+pip install -e .
+pip install -r requirements-dev.txt
+```
 
-## Troubleshooting
+### Running Tests
+```bash
+python -m pytest tests/
+```
 
-**Issue**: No images downloaded
-- Check your internet connection
-- Try running with `headless=False` to see browser activity
-- Some searches may have limited high-quality images available
+### Code Quality
+```bash
+# Type checking
+mypy src/
 
-**Issue**: Low image quality
-- The script now extracts full-resolution URLs by default
-- Check the JSON files to verify URL quality
-- Some search terms may have fewer high-quality images available
+# Linting
+flake8 src/
 
-**Issue**: Browser errors
-- Run `playwright install` to ensure browsers are installed
-- Try updating Playwright: `pip install --upgrade playwright`
+# Formatting
+black src/
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## ⚠️ Disclaimer
+
+This tool is for educational and research purposes only. Please respect robots.txt files and website terms of service. Use responsibly and consider the legal implications of web scraping in your jurisdiction.
+
+## 🔗 Links
+
+- [GitHub Repository](https://github.com/abanerjee84/google-image-scraper-clean)
+- [Issue Tracker](https://github.com/abanerjee84/google-image-scraper-clean/issues)
+- [Documentation](https://github.com/abanerjee84/google-image-scraper-clean#readme)
+
+## 📈 Roadmap
+
+- [ ] Add support for other search engines
+- [ ] Implement image deduplication
+- [ ] Add batch processing capabilities
+- [ ] Create web interface
+- [ ] Add docker support
+- [ ] Implement caching mechanisms
