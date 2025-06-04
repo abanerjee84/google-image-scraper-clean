@@ -24,6 +24,8 @@ def is_valid_image_url(url: str) -> bool:
         parsed = urlparse(url)
         if not parsed.scheme or not parsed.netloc:
             return False
+        if parsed.scheme not in {"http", "https"}:
+            return False
         
         # Check file extension
         path = parsed.path.lower()
@@ -91,7 +93,7 @@ def filter_thumbnail_urls(urls: List[str], thumbnail_patterns: List[str]) -> Lis
     filtered_urls = []
     for url in urls:
         is_thumbnail = any(pattern in url.lower() for pattern in thumbnail_patterns)
-        if not is_thumbnail and len(url) > 50:  # Longer URLs often indicate full resolution
+        if not is_thumbnail:
             filtered_urls.append(url)
     return filtered_urls
 
